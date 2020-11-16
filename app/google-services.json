@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "475674067148",
+    "firebase_url": "https://appdb-7442c.firebaseio.com",
+    "project_id": "appdb-7442c",
+    "storage_bucket": "appdb-7442c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:475674067148:android:9bef5d1bd1d885ad954269",
+        "android_client_info": {
+          "package_name": "com.example.rommies"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "475674067148-v26iv29ehdur34u2im3cr16lu3f62ghg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD9A2Pt4rT1hQyRzWTanYixOmBzt2O_Hcw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "475674067148-v26iv29ehdur34u2im3cr16lu3f62ghg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
