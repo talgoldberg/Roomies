@@ -6,7 +6,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-public class MainActivity extends AppCompatActivity {
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+public class MainActivity extends AppCompatActivity
+{
+    private DatabaseReference fdb2 = FirebaseDatabase.getInstance().getReference("Users");
+    private DatabaseReference fdb = FirebaseDatabase.getInstance().getReference("Apartments");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
