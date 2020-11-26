@@ -64,6 +64,7 @@ public class afterRegister extends AppCompatActivity
     private static final int REQUEST_SEND_SMS = 2;
     private static final String DEBUG_TAG = "0";
     private Button create;
+    private Button join;
     private EditText etAprName;
     private Dialog d;
     private Map<String, String> contacts = new HashMap<>();
@@ -76,7 +77,9 @@ public class afterRegister extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_after_register);
+        join=(Button)findViewById(R.id.join); ///
         create = (Button)findViewById(R.id.create);
+        join.setOnClickListener((v)-> {Intent intent=new Intent(this,joinToExistApartment.class); startActivity(intent);}); ///
         create.setOnClickListener((v)->
         {
 
