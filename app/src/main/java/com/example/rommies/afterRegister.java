@@ -79,7 +79,15 @@ public class afterRegister extends AppCompatActivity
         setContentView(R.layout.activity_after_register);
         join=(Button)findViewById(R.id.join); ///
         create = (Button)findViewById(R.id.create);
-        join.setOnClickListener((v)-> {Intent intent=new Intent(this,joinToExistApartment.class); startActivity(intent);}); ///
+        join.setOnClickListener((v)-> {
+            Intent intentOld=getIntent();
+            Intent intent=new Intent(this,joinToExistApartment.class);
+            intent.putExtra("Uid",intentOld.getExtras().getString("Uid"));
+
+
+            startActivity(intent);}); ///
+
+
         create.setOnClickListener((v)->
         {
 
