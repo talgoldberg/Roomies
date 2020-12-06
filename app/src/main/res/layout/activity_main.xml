@@ -58,9 +58,9 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/imageView1"
                     android:layout_marginLeft="25dp"
-                    android:textColor="@color/txt"
                     android:text="@string/register"
                     android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                    android:textColor="@color/txt"
                     android:textSize="20sp">
 
                 </androidx.appcompat.widget.AppCompatTextView>
