@@ -66,6 +66,7 @@ public class Register extends AppCompatActivity
                     {
                         if (!task.isSuccessful())
                         {
+                            pb.setVisibility(View.GONE);
                             Toast.makeText(Register.this, "Error! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                             return;
                         }
