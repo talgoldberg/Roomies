@@ -26,18 +26,18 @@ import java.util.ArrayList;
 
 public class Apartment extends AppCompatActivity {
 
-    ListView listViewRoomate;
-    ArrayAdapter<String> adapter;
-    TextView aprName;
-    static ArrayList<String> array_roomate;
-    static ArrayList<String> list_roomate;
-    FirebaseAuth mAuth;
+    private ListView listViewRoomate;
+    private ArrayAdapter<String> adapter;
+    private TextView aprName;
+    private static ArrayList<String> array_roomate;
+    private static ArrayList<String> list_roomate;
+    private FirebaseAuth mAuth;
 
-    FloatingActionButton plusbtn;
-    DatabaseReference get_key_aprt;
-    DatabaseReference get_roomies;
-    DatabaseReference get_room_name;
-    String idAprt="";
+    private FloatingActionButton plusbtn;
+    private DatabaseReference get_key_aprt;
+    private DatabaseReference get_roomies;
+    private DatabaseReference get_room_name;
+    private String idAprt="";
 
 
 
