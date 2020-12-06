@@ -1,6 +1,5 @@
 package com.example.rommies;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
@@ -46,12 +45,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 
@@ -73,9 +69,6 @@ public class afterRegister extends AppCompatActivity
     private Map<String, String> contacts = new HashMap<>();
     private ProgressBar pb;
     private String aprKey = "";
-    private DataSnapshot ds;
-    private DatabaseReference dbRef;
-    private DatabaseReference aprRef;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -84,24 +77,6 @@ public class afterRegister extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_after_register);
         create = (Button)findViewById(R.id.create);
-        dbRef = FirebaseDatabase.getInstance().getReference();
-        aprKey = dbRef.push().getKey();
-        aprRef = dbRef.child("/Apartments/"+aprKey+"/");
-        aprRef.addValueEventListener(new ValueEventListener()
-        {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot)
-            {
-                    System.out.println("updated");
-
-                ds = snapshot;
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error)
-            {
-
-            }
-        });
         create.setOnClickListener((v)->
         {
 
@@ -112,7 +87,7 @@ public class afterRegister extends AppCompatActivity
             d.show();
             pb = (ProgressBar)d.findViewById(R.id.progressBar);
             etAprName = (EditText)d.findViewById(R.id.apartmentName);
-            ((Button)d.findViewById(R.id.createAprSms)).setOnClickListener((v1 ->
+            ((Button)d.findViewById(R.id.createApr)).setOnClickListener((v1 ->
             {
                 pb.setVisibility(View.VISIBLE);
                 String aprName = etAprName.getText().toString();
@@ -130,19 +105,19 @@ public class afterRegister extends AppCompatActivity
                     }
                     else
                     {
-                        sendSms();
+                            DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("/Apartments");
+                            aprKey = dbRef.push().getKey();
+                            dbRef.child("/"+aprKey+"/roommates").child("Uid").setValue(FirebaseAuth.getInstance().getUid());
+                            dbRef.child("/"+aprKey+"/Manager").setValue(FirebaseAuth.getInstance().getUid());
+                            dbRef.child("/"+aprKey+"/Name").setValue(aprName);
+                            sendSms();
                     }
                 }
-                aprRef.child("/roommates/Uid").setValue(FirebaseAuth.getInstance().getUid());
-                aprRef.child("/Manager").setValue(FirebaseAuth.getInstance().getUid());
-                aprRef.child("/Name").setValue(aprName);
-                dbRef.child("/Users/"+FirebaseAuth.getInstance().getUid()+"/apartment_Key").setValue(aprKey);
                 pb.setVisibility(View.GONE);
                 Toast.makeText(this,"Apartment created successfully!",Toast.LENGTH_SHORT).show();
-                d.dismiss();
 
             }));
-            //Intent ...........
+
         });
     }
 
@@ -160,7 +135,7 @@ public class afterRegister extends AppCompatActivity
     }
 
     //handle the permission request results
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case REQUEST_READ_CONTACTS: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -191,7 +166,7 @@ public class afterRegister extends AppCompatActivity
             {
                 case CONTACT_PICKER_RESULT:
                     Cursor phones = null, names = null;
-                    String number, name;
+                    String number = "", name = "";
                     try {
                         Uri result = data.getData();
                         Log.v(DEBUG_TAG, "Got a contact result: " + result.toString());
@@ -226,10 +201,11 @@ public class afterRegister extends AppCompatActivity
                             bt.setTextColor(Color.WHITE);
                             bt.setBackground(shape);
                             bt.setPadding(10,5,10,5);
-                            bt.setOnClickListener((v)->
-                            {
-                                contacts.remove(name);
-                                ll.removeView(rl);
+                            bt.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    ll.removeView(rl);
+                                }
                             });
                             RelativeLayout.LayoutParams rl_lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
                             RelativeLayout.LayoutParams tv_lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
