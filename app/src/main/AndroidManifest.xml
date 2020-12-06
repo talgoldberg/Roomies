@@ -27,6 +27,8 @@
             android:label="@string/title_activity_register"
             android:theme="@style/Theme.Rommies.NoActionBar" />
         <activity android:name=".afterRegister" />
+        <activity android:name=".Apartment" />
+        <activity android:name=".MyAccount" />
     </application>
 
 </manifest>

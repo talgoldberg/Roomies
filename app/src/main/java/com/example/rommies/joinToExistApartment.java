@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,6 +19,7 @@ public class joinToExistApartment extends AppCompatActivity {
     Button join;
     EditText aprtCode;
     DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
+    DatabaseReference reference=FirebaseDatabase.getInstance().getReference().child("Users");
 
 
     @Override
@@ -30,17 +32,20 @@ public class joinToExistApartment extends AppCompatActivity {
 
 
         Intent intentOld=getIntent();
-        Intent intent=new Intent(this,mytest.class);
-       String UserId=intentOld.getExtras().getString("Uid");
+       String UserId=intentOld.getExtras().getString("com.example.roomies.Uid");
+        String Name=intentOld.getExtras() .getString("com.example.roomies.Name");
 
         join.setOnClickListener(v->
         {
             String TheCode=aprtCode.getText().toString();
 
-            System.out.println("------------------aprt code is"+ TheCode +
+            Log.v("d","---- aprt code is"+ TheCode +
                     " userid is "+UserId);
-            dbRef.child("Apartments").child(TheCode).child("roommates").push().setValue(UserId);
+            dbRef.child("Apartments").child(TheCode).child("roommates").child(UserId).setValue(Name);
+            reference.child(UserId).child("IDAprt").setValue(TheCode);
             Toast.makeText(joinToExistApartment.this, "successfully", Toast.LENGTH_SHORT).show();
+            Intent intent=new Intent(this,Apartment.class);
+            intent.putExtra("com.example.rommies.aprKey",TheCode);
             startActivity(intent);
 
 
