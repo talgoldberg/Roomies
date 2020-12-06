@@ -30,7 +30,7 @@ public class Apartment extends AppCompatActivity {
     private ArrayAdapter<String> adapter;
     private TextView aprName;
     private static ArrayList<String> array_roomate;
-    private static ArrayList<String> list_roomate;
+
     private FirebaseAuth mAuth;
 
     private FloatingActionButton plusbtn;
@@ -50,34 +50,60 @@ public class Apartment extends AppCompatActivity {
         listViewRoomate=(ListView)findViewById(R.id.listApart);
         plusbtn=(FloatingActionButton)findViewById(R.id.plusBtn);
         array_roomate=new ArrayList<>();
-        list_roomate=new ArrayList<>();
+
         mAuth=FirebaseAuth.getInstance();
 
         adapter=new ArrayAdapter<String>(Apartment.this,android.R.layout.simple_list_item_1,array_roomate);
         listViewRoomate.setAdapter(adapter);
 
-        get_key_aprt = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getUid());
+        if(getIntent().hasExtra("com.example.rommies.aprKey"))
+        {
+            String key=getIntent().getStringExtra("com.example.rommies.aprKey");
 
-        get_key_aprt.addValueEventListener(new ValueEventListener() {
+            get_room_name=FirebaseDatabase.getInstance().getReference().child("Apartments").child(key).child("Name");
+            get_room_name.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    String nameAprt=snapshot.getValue().toString();
 
+                    aprName.setText(nameAprt);
+                    updateRoommates(key);
+                }
 
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                for (DataSnapshot snap : snapshot.getChildren()) {
-                    list_roomate.add(snap.getValue().toString());
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
 
                 }
-                idAprt=list_roomate.get(0);
-                getRoomName(idAprt);
-            }
+            });
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
 
-            }
 
-        });
+        }
+
+//        get_key_aprt = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getUid());
+//
+//
+//
+//        get_key_aprt.addValueEventListener(new ValueEventListener() {
+//
+//
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//
+//                for (DataSnapshot snap : snapshot.getChildren()) {
+//                    list_roomate.add(snap.getValue().toString());
+//
+//                }
+//                idAprt=list_roomate.get(0);
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//
+//        });
 
         listViewRoomate.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -92,34 +118,10 @@ public class Apartment extends AppCompatActivity {
 
     }
 
-    public void getRoomName(String keyval)
+
+    public void updateRoommates(String key)
     {
-        get_room_name=FirebaseDatabase.getInstance().getReference().child("Apartments").child(keyval).child("Name");
-
-
-        get_room_name.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-
-                String nameAprt=snapshot.getValue().toString();
-
-                aprName.setText(nameAprt);
-                update(keyval);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-
-    }
-
-    public void update(String key)
-    {
-        get_roomies= FirebaseDatabase.getInstance().getReference().child("Apartments").child(key).child("roommates").child("Uid");
+        get_roomies= FirebaseDatabase.getInstance().getReference().child("Apartments").child(key).child("roommates");
 
         get_roomies.addValueEventListener(new ValueEventListener() {
             @Override
@@ -132,7 +134,6 @@ public class Apartment extends AppCompatActivity {
                 adapter.notifyDataSetChanged();
 
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 

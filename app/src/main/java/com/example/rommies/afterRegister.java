@@ -3,14 +3,11 @@ package com.example.rommies;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
 import android.app.Dialog;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -21,27 +18,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.telephony.SmsManager;
-import android.telephony.SmsMessage;
-import android.text.Layout;
 import android.text.TextUtils;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ActionMenuView;
-import android.widget.Adapter;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.GridLayout;
-import android.widget.GridView;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,12 +37,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import android.provider.ContactsContract.Contacts;
-import android.provider.ContactsContract.CommonDataKinds.Email;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.jar.Attributes;
 
 public class afterRegister extends AppCompatActivity
 {
@@ -68,14 +50,18 @@ public class afterRegister extends AppCompatActivity
     private static final int REQUEST_SEND_SMS = 2;
     private static final String DEBUG_TAG = "0";
     private Button create;
+    private Button join;
     private EditText etAprName;
     private Dialog d;
     private Map<String, String> contacts = new HashMap<>();
     private ProgressBar pb;
     private String aprKey = "";
+    private String Name = "";
     private DataSnapshot ds;
     private DatabaseReference dbRef;
     private DatabaseReference aprRef;
+    DatabaseReference reference;
+    FirebaseAuth mAuth;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -83,24 +69,31 @@ public class afterRegister extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_after_register);
-        create = (Button)findViewById(R.id.create);
-        dbRef = FirebaseDatabase.getInstance().getReference();
-        aprKey = dbRef.push().getKey();
-        aprRef = dbRef.child("/Apartments/"+aprKey+"/");
-        aprRef.addValueEventListener(new ValueEventListener()
-        {
+        create = (Button)findViewById(R.id.createApr);
+        join=(Button)findViewById(R.id.joinApr);
+        mAuth=FirebaseAuth.getInstance();
+        reference = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getUid());
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot)
-            {
-                    System.out.println("updated");
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                ds = snapshot;
+                Name=snapshot.child("name").getValue().toString();
             }
+
             @Override
-            public void onCancelled(@NonNull DatabaseError error)
-            {
+            public void onCancelled(@NonNull DatabaseError error) {
 
             }
+        });
+
+
+        //aprRef = dbRef.child("/Apartments/"+aprKey+"/");
+        join.setOnClickListener((v)->{
+
+            Intent i=new Intent(afterRegister.this,joinToExistApartment.class);
+            i.putExtra("com.example.roomies.Name",Name);
+            i.putExtra("com.example.roomies.Uid",mAuth.getUid());
+            startActivity(i);
         });
         create.setOnClickListener((v)->
         {
@@ -133,16 +126,21 @@ public class afterRegister extends AppCompatActivity
                         sendSms();
                     }
                 }
-                aprRef.child("/roommates/Uid").setValue(FirebaseAuth.getInstance().getUid());
-                aprRef.child("/Manager").setValue(FirebaseAuth.getInstance().getUid());
-                aprRef.child("/Name").setValue(aprName);
-                dbRef.child("/Users/"+FirebaseAuth.getInstance().getUid()+"/apartment_Key").setValue(aprKey);
+                dbRef = FirebaseDatabase.getInstance().getReference("/Apartments");
+                aprKey = dbRef.push().getKey();
+                dbRef.child("/"+aprKey+"/roommates").child(mAuth.getUid()).setValue(Name);
+                dbRef.child("/"+aprKey+"/Manager").setValue(mAuth.getUid());
+                dbRef.child("/"+aprKey+"/Name").setValue(aprName);
+                reference.child("IDAprt").setValue(aprKey);
                 pb.setVisibility(View.GONE);
                 Toast.makeText(this,"Apartment created successfully!",Toast.LENGTH_SHORT).show();
                 d.dismiss();
-
+                Intent intent=new Intent(afterRegister.this,Apartment.class);
+                intent.putExtra("com.example.rommies.aprKey",aprKey);
+                startActivity(intent);
             }));
-            //Intent ...........
+
+
         });
     }
 
