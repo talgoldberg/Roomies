@@ -42,13 +42,12 @@ public class joinToExistApartment extends AppCompatActivity {
             Log.v("d","---- aprt code is"+ TheCode +
                     " userid is "+UserId);
             dbRef.child("Apartments").child(TheCode).child("roommates").child(UserId).setValue(Name);
-            reference.child(UserId).child("IDAprt").setValue(TheCode);
+            reference.child(UserId).child("Apartment_key").setValue(TheCode);
             Toast.makeText(joinToExistApartment.this, "successfully", Toast.LENGTH_SHORT).show();
             Intent intent=new Intent(this,Apartment.class);
             intent.putExtra("com.example.rommies.aprKey",TheCode);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-
-
 
 
         });

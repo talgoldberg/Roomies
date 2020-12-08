@@ -3,9 +3,11 @@ package com.example.rommies;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Intent;
@@ -86,8 +88,6 @@ public class afterRegister extends AppCompatActivity
             }
         });
 
-
-        //aprRef = dbRef.child("/Apartments/"+aprKey+"/");
         join.setOnClickListener((v)->{
 
             Intent i=new Intent(afterRegister.this,joinToExistApartment.class);
@@ -97,7 +97,6 @@ public class afterRegister extends AppCompatActivity
         });
         create.setOnClickListener((v)->
         {
-
             d = new Dialog(this);
             d.setContentView(R.layout.create_apartment);
             d.setTitle("Create apartment");
@@ -105,8 +104,11 @@ public class afterRegister extends AppCompatActivity
             d.show();
             pb = (ProgressBar)d.findViewById(R.id.progressBar);
             etAprName = (EditText)d.findViewById(R.id.apartmentName);
+            dbRef = FirebaseDatabase.getInstance().getReference("/Apartments");
+            aprKey = dbRef.push().getKey();
             ((Button)d.findViewById(R.id.createAprSms)).setOnClickListener((v1 ->
             {
+                boolean permissionRequested = false;
                 pb.setVisibility(View.VISIBLE);
                 String aprName = etAprName.getText().toString();
                 if(TextUtils.isEmpty(aprName))
@@ -115,35 +117,43 @@ public class afterRegister extends AppCompatActivity
                     pb.setVisibility(View.GONE);
                     return;
                 }
-                if(!contacts.isEmpty())
+                if(!contacts.isEmpty())//IF YOU CHOOSE CONTACTS TO SEND SMS TO
                 {
                     if(checkSelfPermission(Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED)
                     {
+                        permissionRequested = true;
+                        pb.setVisibility(View.GONE);
                         requestPermissions(new String[]{Manifest.permission.SEND_SMS}, REQUEST_SEND_SMS);
                     }
                     else
                     {
                         sendSms();
+                        createApr();
                     }
                 }
-                dbRef = FirebaseDatabase.getInstance().getReference("/Apartments");
-                aprKey = dbRef.push().getKey();
-                dbRef.child("/"+aprKey+"/roommates").child(mAuth.getUid()).setValue(Name);
-                dbRef.child("/"+aprKey+"/Manager").setValue(mAuth.getUid());
-                dbRef.child("/"+aprKey+"/Name").setValue(aprName);
-                reference.child("IDAprt").setValue(aprKey);
-                pb.setVisibility(View.GONE);
-                Toast.makeText(this,"Apartment created successfully!",Toast.LENGTH_SHORT).show();
-                d.dismiss();
-                Intent intent=new Intent(afterRegister.this,Apartment.class);
-                intent.putExtra("com.example.rommies.aprKey",aprKey);
-                startActivity(intent);
+                if(!permissionRequested) {
+                    createApr();
+                }
             }));
 
 
         });
     }
 
+    private void createApr()
+    {
+        dbRef.child("/"+aprKey+"/roommates").child(mAuth.getUid()).setValue(Name);
+        dbRef.child("/"+aprKey+"/Manager").setValue(mAuth.getUid());
+        dbRef.child("/"+aprKey+"/Name").setValue(etAprName.getText().toString());
+        reference.child("Apartment_key").setValue(aprKey);
+        pb.setVisibility(View.GONE);
+        Toast.makeText(this,"Apartment created successfully!",Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(afterRegister.this, Apartment.class);
+        intent.putExtra("com.example.rommies.aprKey", aprKey);
+        startActivity(intent);
+        finish();
+        d.dismiss();
+    }
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -169,6 +179,7 @@ public class afterRegister extends AppCompatActivity
             case REQUEST_SEND_SMS: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     sendSms();
+                    createApr();
                 }
                 break;
             }
@@ -269,6 +280,7 @@ public class afterRegister extends AppCompatActivity
 
     private void sendSms()//send sms to selected roommates
     {
+        Log.v(DEBUG_TAG,"ENTERED sendSms");
         String SENT = "SMS_SENT";
         String DELIVERED = "SMS_DELIVERED";
         ArrayList<PendingIntent> sentPI = new ArrayList<>();
