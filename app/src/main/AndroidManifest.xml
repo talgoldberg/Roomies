@@ -26,6 +26,7 @@
         <activity android:name=".afterRegisterActivity" >
 
         </activity>
+        <activity android:name=".ManagerActivity" />
         <activity android:name=".ApartmentActivity"
             android:theme="@style/Theme.Rommies.ActionBar">
 
