@@ -1,15 +1,13 @@
 package com.example.rommies;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
 import android.app.Dialog;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -20,43 +18,31 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.telephony.SmsManager;
-import android.telephony.SmsMessage;
-import android.text.Layout;
 import android.text.TextUtils;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ActionMenuView;
-import android.widget.Adapter;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.GridLayout;
-import android.widget.GridView;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import android.provider.ContactsContract.Contacts;
-import android.provider.ContactsContract.CommonDataKinds.Email;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.jar.Attributes;
 
-public class afterRegister extends AppCompatActivity
+public class afterRegisterActivity extends AppCompatActivity
 {
 
     private static final int CONTACT_PICKER_RESULT = 1001;
@@ -64,11 +50,18 @@ public class afterRegister extends AppCompatActivity
     private static final int REQUEST_SEND_SMS = 2;
     private static final String DEBUG_TAG = "0";
     private Button create;
+    private Button join;
     private EditText etAprName;
     private Dialog d;
     private Map<String, String> contacts = new HashMap<>();
     private ProgressBar pb;
     private String aprKey = "";
+    private String Name = "";
+    private DataSnapshot ds;
+    private DatabaseReference dbRef;
+    private DatabaseReference aprRef;
+    DatabaseReference reference;
+    FirebaseAuth mAuth;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -76,10 +69,32 @@ public class afterRegister extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_after_register);
-        create = (Button)findViewById(R.id.create);
+        create = (Button)findViewById(R.id.createApr);
+        join=(Button)findViewById(R.id.joinApr);
+        mAuth=FirebaseAuth.getInstance();
+        reference = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getUid());
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                Name=snapshot.child("name").getValue().toString();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        join.setOnClickListener((v)->{
+
+            Intent i=new Intent(afterRegisterActivity.this, JoinAprActivity.class);
+            i.putExtra("com.example.roomies.Name",Name);
+            i.putExtra("com.example.roomies.Uid",mAuth.getUid());
+            startActivity(i);
+        });
         create.setOnClickListener((v)->
         {
-
             d = new Dialog(this);
             d.setContentView(R.layout.create_apartment);
             d.setTitle("Create apartment");
@@ -87,8 +102,11 @@ public class afterRegister extends AppCompatActivity
             d.show();
             pb = (ProgressBar)d.findViewById(R.id.progressBar);
             etAprName = (EditText)d.findViewById(R.id.apartmentName);
-            ((Button)d.findViewById(R.id.createApr)).setOnClickListener((v1 ->
+            dbRef = FirebaseDatabase.getInstance().getReference("/Apartments");
+            aprKey = dbRef.push().getKey();
+            ((Button)d.findViewById(R.id.createAprSms)).setOnClickListener((v1 ->
             {
+                boolean permissionRequested = false;
                 pb.setVisibility(View.VISIBLE);
                 String aprName = etAprName.getText().toString();
                 if(TextUtils.isEmpty(aprName))
@@ -97,30 +115,43 @@ public class afterRegister extends AppCompatActivity
                     pb.setVisibility(View.GONE);
                     return;
                 }
-                if(!contacts.isEmpty())
+                if(!contacts.isEmpty())//IF YOU CHOOSE CONTACTS TO SEND SMS TO
                 {
                     if(checkSelfPermission(Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED)
                     {
+                        permissionRequested = true;
+                        pb.setVisibility(View.GONE);
                         requestPermissions(new String[]{Manifest.permission.SEND_SMS}, REQUEST_SEND_SMS);
                     }
                     else
                     {
-                            DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("/Apartments");
-                            aprKey = dbRef.push().getKey();
-                            dbRef.child("/"+aprKey+"/roommates").child("Uid").setValue(FirebaseAuth.getInstance().getUid());
-                            dbRef.child("/"+aprKey+"/Manager").setValue(FirebaseAuth.getInstance().getUid());
-                            dbRef.child("/"+aprKey+"/Name").setValue(aprName);
-                            sendSms();
+                        sendSms();
+                        createApr();
                     }
                 }
-                pb.setVisibility(View.GONE);
-                Toast.makeText(this,"Apartment created successfully!",Toast.LENGTH_SHORT).show();
-
+                if(!permissionRequested) {
+                    createApr();
+                }
             }));
+
 
         });
     }
 
+    private void createApr()
+    {
+        dbRef.child("/"+aprKey+"/roommates").child(mAuth.getUid()).setValue(Name);
+        dbRef.child("/"+aprKey+"/Manager").setValue(mAuth.getUid());
+        dbRef.child("/"+aprKey+"/Name").setValue(etAprName.getText().toString());
+        reference.child("Apartment_key").setValue(aprKey);
+        pb.setVisibility(View.GONE);
+        Toast.makeText(this,"Apartment created successfully!",Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(afterRegisterActivity.this, ApartmentActivity.class);
+        intent.putExtra("com.example.rommies.aprKey", aprKey);
+        startActivity(intent);
+        finish();
+        d.dismiss();
+    }
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -135,7 +166,7 @@ public class afterRegister extends AppCompatActivity
     }
 
     //handle the permission request results
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQUEST_READ_CONTACTS: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -146,6 +177,7 @@ public class afterRegister extends AppCompatActivity
             case REQUEST_SEND_SMS: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     sendSms();
+                    createApr();
                 }
                 break;
             }
@@ -166,7 +198,7 @@ public class afterRegister extends AppCompatActivity
             {
                 case CONTACT_PICKER_RESULT:
                     Cursor phones = null, names = null;
-                    String number = "", name = "";
+                    String number = null, name;
                     try {
                         Uri result = data.getData();
                         Log.v(DEBUG_TAG, "Got a contact result: " + result.toString());
@@ -201,11 +233,10 @@ public class afterRegister extends AppCompatActivity
                             bt.setTextColor(Color.WHITE);
                             bt.setBackground(shape);
                             bt.setPadding(10,5,10,5);
-                            bt.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    ll.removeView(rl);
-                                }
+                            bt.setOnClickListener((v)->
+                            {
+                                contacts.remove(name);
+                                ll.removeView(rl);
                             });
                             RelativeLayout.LayoutParams rl_lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
                             RelativeLayout.LayoutParams tv_lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -247,6 +278,7 @@ public class afterRegister extends AppCompatActivity
 
     private void sendSms()//send sms to selected roommates
     {
+        Log.v(DEBUG_TAG,"ENTERED sendSms");
         String SENT = "SMS_SENT";
         String DELIVERED = "SMS_DELIVERED";
         ArrayList<PendingIntent> sentPI = new ArrayList<>();
