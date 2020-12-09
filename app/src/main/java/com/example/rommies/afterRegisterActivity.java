@@ -3,11 +3,9 @@ package com.example.rommies;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Intent;
@@ -44,7 +42,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class afterRegister extends AppCompatActivity
+public class afterRegisterActivity extends AppCompatActivity
 {
 
     private static final int CONTACT_PICKER_RESULT = 1001;
@@ -90,7 +88,7 @@ public class afterRegister extends AppCompatActivity
 
         join.setOnClickListener((v)->{
 
-            Intent i=new Intent(afterRegister.this,joinToExistApartment.class);
+            Intent i=new Intent(afterRegisterActivity.this, JoinAprActivity.class);
             i.putExtra("com.example.roomies.Name",Name);
             i.putExtra("com.example.roomies.Uid",mAuth.getUid());
             startActivity(i);
@@ -148,7 +146,7 @@ public class afterRegister extends AppCompatActivity
         reference.child("Apartment_key").setValue(aprKey);
         pb.setVisibility(View.GONE);
         Toast.makeText(this,"Apartment created successfully!",Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(afterRegister.this, Apartment.class);
+        Intent intent = new Intent(afterRegisterActivity.this, ApartmentActivity.class);
         intent.putExtra("com.example.rommies.aprKey", aprKey);
         startActivity(intent);
         finish();

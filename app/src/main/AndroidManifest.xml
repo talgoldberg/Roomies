@@ -12,8 +12,8 @@
         android:roundIcon="@drawable/circled_logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.Rommies">
-        <activity android:name=".mytest"></activity>
-        <activity android:name=".joinToExistApartment" />
+        <activity android:name=".JoinAprActivity" />
+        <activity android:name=".PurchaseActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,12 +21,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Login" />
-        <activity android:name=".Register" />
-        <activity android:name=".afterRegister" >
+        <activity android:name=".LoginActivity" />
+        <activity android:name=".RegisterActivity" />
+        <activity android:name=".afterRegisterActivity" >
 
         </activity>
-        <activity android:name=".Apartment"
+        <activity android:name=".ApartmentActivity"
             android:theme="@style/Theme.Rommies.ActionBar">
 
         </activity>
