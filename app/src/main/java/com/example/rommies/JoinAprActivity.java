@@ -101,9 +101,9 @@ public class JoinAprActivity extends AppCompatActivity {
             reference.child(UserId).child("IDAprt").setValue(code);
 
 
+            Toast.makeText(JoinAprActivity.this, "successfully", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, ApartmentActivity.class);
 
-        Toast.makeText(JoinAprActivity.this, "successfully", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(this, Apartment.class);
             intent.putExtra("com.example.rommies.aprKey", code);
             startActivity(intent);
 

@@ -122,6 +122,7 @@ public class ApartmentActivity extends AppCompatActivity {
             }
 //            case R.id.adminBtn:
 //            {
+
 //                break;
 //            }
         }
