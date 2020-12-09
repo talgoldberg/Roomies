@@ -3,6 +3,7 @@
  import android.content.Intent;
  import android.os.Bundle;
  import android.text.TextUtils;
+ import android.util.Log;
  import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.AdapterView;
@@ -14,7 +15,8 @@ import android.widget.ListView;
 import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+ import androidx.annotation.Nullable;
+ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -22,7 +24,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+ import com.google.firebase.database.MutableData;
+ import com.google.firebase.database.Transaction;
+ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,7 +40,7 @@ import java.util.Map;
     private FirebaseDatabase mFD;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private DatabaseReference mRef,aprRef;
+    private DatabaseReference userRef,aprRef;
 
     private Spinner spinner;
     private LinearLayout linear;
@@ -57,7 +61,7 @@ import java.util.Map;
     private ArrayList<String> arruser;
     private ListView listname;
     private HashMap<String, String> checkedNames = new HashMap<>();
-    private HashMap<String,Double> status= new HashMap<>();
+    private HashMap<String,Double> NeedToPayMe= new HashMap<>();
     private Payment pay;
 
 
@@ -72,15 +76,15 @@ import java.util.Map;
         userID = user.getUid();
         Money = findViewById(R.id.amount);
         btfinish = findViewById(R.id.finish1);
-        mRef = FirebaseDatabase.getInstance().getReference("/Apartments/"+key_ap).child("Balance").child(userID);
-        mRef.addValueEventListener(new ValueEventListener() {
+        userRef = FirebaseDatabase.getInstance().getReference("/Apartments/"+key_ap).child("Balance").child(userID);
+        userRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot)
             {
                 for(DataSnapshot ds : snapshot.getChildren())
                 {
                     String t= ""+ ds.getValue();
-                    status.put(ds.getKey(),Double.parseDouble(t));
+                    NeedToPayMe.put(ds.getKey(),Double.parseDouble(t));
                 }
             }
 
@@ -145,21 +149,49 @@ import java.util.Map;
                 }
                 Amount=Integer.parseInt(Money.getText().toString());
                 spin=spinner.getSelectedItem().toString();
-                double finalAmount=Amount/(checkedNames.size()+1);
+                double payPerPerson = (double)Amount/(checkedNames.size()+1);
+                System.out.println("payPerPerson: "+payPerPerson);
                 ArrayList<String> uid=new ArrayList<>();
                 aprRef = FirebaseDatabase.getInstance().getReference("Apartments");
-                pay = new Payment(userID,finalAmount, spin);
-                aprRef.child(key_ap).child("Payment").child(mRef.push().getKey()).setValue(pay);
-                for(Map.Entry<String, String> entry:checkedNames.entrySet())
+                pay = new Payment(userID,payPerPerson, spin);
+                aprRef.child(key_ap).child("Payment").child(userRef.push().getKey()).setValue(pay);
+                int i=1;
+                for(Map.Entry<String, String> entry : checkedNames.entrySet())//add to specific user the amount to pay me
                 {
-                    uid.add(entry.getKey());
-                    double money=(Double)status.get(entry.getKey());
-                    mRef.child(entry.getKey()).setValue(money + finalAmount);
-                    if(money>0){
-                        aprRef.child(key_ap).child("Balance").child(entry.getKey()).child(userID).setValue( money - finalAmount);
-                    }else{
-                        aprRef.child(key_ap).child("Balance").child(entry.getKey()).child(userID).setValue( (-money) - finalAmount);
-                    }
+
+                    String owe = entry.getKey();
+                    System.out.println("owe: "+owe+", user: "+userID);
+                    System.out.println("11111111"+aprRef.child(key_ap).child("Balance").child(owe).child(userID).getKey());
+                    aprRef.child(key_ap).child("Balance").child(owe).child(userID).runTransaction(new Transaction.Handler()
+                    {
+                        @NonNull
+                        @Override
+                        public Transaction.Result doTransaction(@NonNull MutableData currentData)
+                        {
+                            System.out.println("2222"+currentData.getKey());
+                            double v = 0;
+                            if(currentData.getValue() != null) {
+                                v =currentData.getValue(Double.class);
+                            }
+                            v-= payPerPerson;
+                            currentData.setValue(v);
+                            return Transaction.success(currentData);
+                        }
+
+                        @Override
+                        public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
+                            if(!committed)
+                                Log.d(TAG, "runTransaction: " + error);
+                            else
+                                Log.d(TAG, "runTransaction completed" );
+                        }
+                    });
+                    uid.add(owe);
+                    double currentBalance = NeedToPayMe.get(owe);
+                    System.out.println("currentBalance: "+currentBalance+", payPerPerson: "+ payPerPerson);
+                    userRef.child(owe).setValue(currentBalance + payPerPerson);
+//                    aprRef.child(key_ap).child("Balance").child(owe).child(userID).setValue( (currentBalance) - payPerPerson);
+
                 }
 
                 finish();

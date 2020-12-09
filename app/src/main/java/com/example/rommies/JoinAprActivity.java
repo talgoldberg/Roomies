@@ -98,7 +98,7 @@ public class JoinAprActivity extends AppCompatActivity {
     public void play(String code, String UserId,String Name) {
 
             dbRef.child(code).child("roommates").child(UserId).setValue(Name);
-            reference.child(UserId).child("IDAprt").setValue(code);
+            reference.child(UserId).child("Apartment_key").setValue(code);
 
 
             Toast.makeText(JoinAprActivity.this, "successfully", Toast.LENGTH_SHORT).show();
