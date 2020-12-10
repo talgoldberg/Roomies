@@ -31,32 +31,24 @@ import java.util.Map;
 
 public class ApartmentActivity extends AppCompatActivity {
 
-    private ListView listViewRoomate;
+    private ListView listViewRoommates;
     private ArrayAdapter<String> adapter;
     private TextView aprName;
-    private String aprKey;
-    private static ArrayList<String> roommates;
-    ArrayList<String> withoutmanager;
+    private static ArrayList<String> roommates, withoutManagerArr;
     private FirebaseAuth mAuth;
-    String manager="";
-    String uidManager="";
-    private DatabaseReference get_roomies;
-    private DatabaseReference get_room_name;
-    private boolean isManager = false;
+    private String manager, managerUid, aprKey;
+    private DatabaseReference get_roomies, get_room_name;
     private MenuItem adminBtn;
     private HashMap<String, String> usersMap = new HashMap<>();
 
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
-        adminBtn = menu.getItem(0);
-        return super.onCreateOptionsMenu(menu);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_apartment);
+        mAuth=FirebaseAuth.getInstance();
+        aprName = findViewById(R.id.ApartamenTextView);
 
         /*handle back button press */
 
@@ -84,7 +76,7 @@ public class ApartmentActivity extends AppCompatActivity {
 
                     aprName.setText(snapshot.child("Name").getValue().toString());
                     if(mAuth.getUid().equals(snapshot.child("Manager").getValue())){
-                        uidManager=snapshot.child("Manager").getValue().toString();
+                        managerUid=snapshot.child("Manager").getValue().toString();
                         adminBtn.setVisible(true);
 
                     }
@@ -94,14 +86,12 @@ public class ApartmentActivity extends AppCompatActivity {
                 public void onCancelled(@NonNull DatabaseError error) {}
             });
         }
-        aprName = findViewById(R.id.ApartamenTextView);
-        listViewRoomate = findViewById(R.id.listApart);
+
         roommates=new ArrayList<>();
         adapter= new ArrayAdapter<>(ApartmentActivity.this, android.R.layout.simple_list_item_1, roommates);
-        listViewRoomate.setAdapter(adapter);
-        mAuth=FirebaseAuth.getInstance();
-
-        listViewRoomate.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listViewRoommates = findViewById(R.id.listApart);
+        listViewRoommates.setAdapter(adapter);
+        listViewRoommates.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
@@ -114,6 +104,11 @@ public class ApartmentActivity extends AppCompatActivity {
         });
     }
 
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        adminBtn = menu.getItem(0);
+        return super.onCreateOptionsMenu(menu);
+    }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -130,7 +125,7 @@ public class ApartmentActivity extends AppCompatActivity {
             }
             case R.id.adminBtn:
             {
-                withoutmanager=new ArrayList<>();
+                withoutManagerArr=new ArrayList<>();
                 Intent in=new Intent(ApartmentActivity.this, ManagerActivity.class);
                 in.putExtra("keyaprt",aprKey);
                 System.out.println(manager+ "--------->>>>>>");
@@ -138,9 +133,9 @@ public class ApartmentActivity extends AppCompatActivity {
                 {
 
                     if(!manager.equals(roommates.get(i)))
-                        withoutmanager.add(roommates.get(i));
+                        withoutManagerArr.add(roommates.get(i));
                 }
-                in.putStringArrayListExtra("list",withoutmanager);
+                in.putStringArrayListExtra("list",withoutManagerArr);
 
                 in.putExtra("hash",usersMap);
                 startActivity(in);
@@ -162,7 +157,7 @@ public class ApartmentActivity extends AppCompatActivity {
                     roommates.add(snap.getValue().toString());
                     if(!snap.getKey().equals(mAuth.getUid()))
                         usersMap.put(snap.getKey(), (String)snap.getValue());
-                    if(snap.getKey().equals(uidManager))
+                    if(snap.getKey().equals(managerUid))
                         manager=snap.getValue().toString();
 
                 }
