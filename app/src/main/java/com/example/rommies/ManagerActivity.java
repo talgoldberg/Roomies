@@ -1,13 +1,16 @@
 package com.example.rommies;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.PendingIntent;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -19,9 +22,13 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.telephony.SmsManager;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,13 +46,20 @@ import java.util.Map;
 
 public class ManagerActivity extends AppCompatActivity {
 
+    private ListView listViewRoomate;
+    private ArrayAdapter<String> adapter;
     private Dialog d;
     private Map<String, String> contacts = new HashMap<>();
+    private Map<String, String> usersMap = new HashMap<>();
+    private Map<String, String> deleteMapUser = new HashMap<>();
     private static final int CONTACT_PICKER_RESULT = 1001;
     private static final int REQUEST_READ_CONTACTS = 1;
     private static final int REQUEST_SEND_SMS = 2;
     private static final String DEBUG_TAG = "0";
+     ArrayList<String> roommates;
     DatabaseReference dbf;
+     DatabaseReference delete_roomies;
+    DatabaseReference delete_Idaprt_from_users;
     FirebaseAuth fAuth;
     Button addrommies;
     Button deleterommies;
@@ -63,13 +77,23 @@ public class ManagerActivity extends AppCompatActivity {
         addrommies=(Button)findViewById(R.id.buttonAddRommies);
         deleterommies=(Button)findViewById(R.id.buttonDeleteRommies);
         changenameaprt=(Button)findViewById(R.id.buttonNameApartament);
+
+        roommates=new ArrayList<>();
         fAuth=FirebaseAuth.getInstance();
 
-        if(getIntent().hasExtra("keyaprt") && getIntent().hasExtra("manager"))
+        if(getIntent().hasExtra("keyaprt") && getIntent().hasExtra("list") && getIntent().hasExtra("hash"))
         {
             aprkey=getIntent().getStringExtra("keyaprt");
-            manager=getIntent().getStringExtra("manager");
-
+            roommates=getIntent().getStringArrayListExtra("list");
+            usersMap=(HashMap<String, String>)getIntent().getSerializableExtra("hash");
+            for(int i=0; i<roommates.size(); i++)
+            {
+                System.out.println(roommates.get(i)+ " !!!!!!");
+            }
+            for(Map.Entry<String,String> entry: usersMap.entrySet())
+            {
+                System.out.println(entry.getKey() + " ????" + entry.getValue());
+            }
         }
         dbf=FirebaseDatabase.getInstance().getReference().child("Apartments").child(aprkey).child("roommates").child(fAuth.getUid());
         dbf.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -114,6 +138,7 @@ public class ManagerActivity extends AppCompatActivity {
                 {
                     Toast.makeText(ManagerActivity.this,"you need to choose a friend",Toast.LENGTH_SHORT).show();
                 }
+                d.dismiss();
 
             }));
 
@@ -121,6 +146,65 @@ public class ManagerActivity extends AppCompatActivity {
         });
 
         deleterommies.setOnClickListener((v)->{
+            Button cancel;
+            d = new Dialog(this);
+            d.setContentView(R.layout.delete_roomies);
+            d.setTitle("Long press to delete roomies");
+            d.setCancelable(true);
+            d.show();
+            cancel=(Button)d.findViewById(R.id.BtnCancele);
+            listViewRoomate=(ListView)d.findViewById(R.id.listviewchoose);
+            adapter=new ArrayAdapter<>(ManagerActivity.this, android.R.layout.simple_list_item_1,roommates);
+            listViewRoomate.setAdapter(adapter);
+            listViewRoomate.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                    final int item=position;
+
+                        new AlertDialog.Builder(ManagerActivity.this)
+                                .setIcon(android.R.drawable.ic_delete)
+                                .setTitle("Are you sure ?")
+                                .setMessage("Do you want to delete this roomie")
+                                .setPositiveButton("Yes",new DialogInterface.OnClickListener(){
+
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        System.out.println("111111111");
+                                        for(Map.Entry<String,String> entry: usersMap.entrySet())
+                                        {
+                                            System.out.println("000000000"+entry.getKey());
+                                            String uid=entry.getKey();
+                                            String name=entry.getValue();
+                                            if(usersMap.containsKey(uid) && name.equals(roommates.get(item)))
+                                            {
+
+                                                deleteMapUser.put(uid,name);
+                                                usersMap.remove(uid);
+                                                break;
+
+                                            }
+                                        }
+                                        roommates.remove(item);
+                                        adapter.notifyDataSetChanged();
+
+                                    }
+                                })
+                                .setNegativeButton("No", null)
+                                .show();
+
+                    return true;
+                }
+            });
+
+
+            cancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    delete_from_firebase();
+                    d.dismiss();
+                }
+            });
 
 
 
@@ -129,6 +213,73 @@ public class ManagerActivity extends AppCompatActivity {
 
 
 
+
+    }
+
+
+
+    private void delete_from_firebase()
+    {
+        if(!deleteMapUser.isEmpty())
+        {
+            delete_roomies=FirebaseDatabase.getInstance().getReference().child("Apartments").child(aprkey).child("roommates");
+
+            delete_roomies.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                    for(DataSnapshot snap : snapshot.getChildren())
+                    {
+                        String uidkey=snap.getKey();
+                        String username=snap.getValue().toString();
+
+                        for(Map.Entry<String,String> entry : deleteMapUser.entrySet())
+                        {
+                            if(entry.getKey().equals(uidkey) && entry.getValue().equals(username))
+                                snap.getRef().removeValue();
+                        }
+
+                    }
+
+                    deleteUsersIdApart();
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }
+    }
+
+    private void deleteUsersIdApart()
+    {
+        if(!deleteMapUser.isEmpty())
+        {
+            for(Map.Entry<String,String> entry : deleteMapUser.entrySet())
+            {
+                String uid=entry.getKey();
+
+                delete_Idaprt_from_users=FirebaseDatabase.getInstance().getReference().child("Users").child(uid);
+
+                delete_Idaprt_from_users.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                        if(snapshot.hasChild("Apartment_key"))
+                        {
+                            snapshot.getRef().child("Apartment_key").removeValue();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+            }
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -252,6 +403,7 @@ public class ManagerActivity extends AppCompatActivity {
     private void Send_SMS()
     {
 
+
         String SENT = "SMS_SENT";
         String DELIVERED = "SMS_DELIVERED";
         ArrayList<PendingIntent> sentPI = new ArrayList<>();
@@ -267,7 +419,7 @@ public class ManagerActivity extends AppCompatActivity {
             sms.sendMultipartTextMessage(entry.getValue(),null, parts,sentPI, deliveredPI );
             Log.v(DEBUG_TAG,message);
         }
-        d.dismiss();
+
 
     }
 
