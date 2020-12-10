@@ -27,10 +27,10 @@ public class JoinAprActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join_to_exist_apartment);
-        check = findViewById(R.id.checkCode);
-        join = findViewById(R.id.joinButton);
+        check = (Button) findViewById(R.id.checkCode);
+        join = (Button) findViewById(R.id.joinButton);
 
-        aprtCode = findViewById(R.id.CODE);
+        aprtCode = (EditText) findViewById(R.id.CODE);
 
 
         Intent intentOld = getIntent();
@@ -55,10 +55,29 @@ public class JoinAprActivity extends AppCompatActivity {
                                 "Press Join", Toast.LENGTH_SHORT).show();
                         join.setOnClickListener(v ->
                         {
+//                            DatabaseReference romi1= FirebaseDatabase.getInstance().getReference().child("roommates").child(UserId);
+                           // DatabaseReference romi2 = FirebaseDatabase.getInstance().getReference().child("Apartments").child(TheCode).child("Balance").child("UserId");
+                            DatabaseReference aprRef = snapshot.child(TheCode).getRef();
+                            aprRef.addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    for(DataSnapshot ds : snapshot.child("roommates").getChildren()) {
+                                        if (!ds.getKey().equals(UserId))
+                                            aprRef.child("Balance").child(UserId).child(ds.getKey()).setValue(0);
+                                        if (!ds.getKey().equals(UserId))
+                                            aprRef.child("Balance").child(ds.getKey()).child(UserId).setValue(0);
+                                    }
 
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
                             play(TheCode,UserId,Name);
 
-                            
+
                         });
 
                     }
@@ -79,10 +98,12 @@ public class JoinAprActivity extends AppCompatActivity {
     public void play(String code, String UserId,String Name) {
 
             dbRef.child(code).child("roommates").child(UserId).setValue(Name);
-            reference.child(UserId).child("IDAprt").setValue(code);
+            reference.child(UserId).child("Apartment_key").setValue(code);
+
 
             Toast.makeText(JoinAprActivity.this, "successfully", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(this, ApartmentActivity.class);
+
             intent.putExtra("com.example.rommies.aprKey", code);
             startActivity(intent);
 
