@@ -37,9 +37,7 @@ import java.util.Map;
 
 
 
-    private FirebaseDatabase mFD;
     private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
     private DatabaseReference userRef,aprRef;
 
     private Spinner spinner;
@@ -48,14 +46,12 @@ import java.util.Map;
 
 
     private String userID;
-    private EditText etAmount;
     private String key_ap;
     private Map<String, String> users = new HashMap<>();
     private Button btfinish;
     private int Amount;
     private EditText Money;
     private String spin;
-    private ListView lv;
     private ArrayAdapter<String> adapter;
     private ArrayList<String> arrname;
     private ArrayList<String> arruser;
@@ -190,8 +186,6 @@ import java.util.Map;
                     double currentBalance = NeedToPayMe.get(owe);
                     System.out.println("currentBalance: "+currentBalance+", payPerPerson: "+ payPerPerson);
                     userRef.child(owe).setValue(currentBalance + payPerPerson);
-//                    aprRef.child(key_ap).child("Balance").child(owe).child(userID).setValue( (currentBalance) - payPerPerson);
-
                 }
 
                 finish();

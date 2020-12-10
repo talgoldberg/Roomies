@@ -13,8 +13,8 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends AppCompatActivity
 {
-    private DatabaseReference fdb2 = FirebaseDatabase.getInstance().getReference("Users");
-    private DatabaseReference fdb = FirebaseDatabase.getInstance().getReference("Apartments");
+//    private DatabaseReference fdb2 = FirebaseDatabase.getInstance().getReference("Users");
+//    private DatabaseReference fdb = FirebaseDatabase.getInstance().getReference("Apartments");
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override

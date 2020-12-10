@@ -3,7 +3,6 @@ package com.example.rommies;
 public class User
 {
     private String email,name, Uid, Apartment_key = null;
-    public User(){}
     public User(String e, String n)
     {
         this.email = e;

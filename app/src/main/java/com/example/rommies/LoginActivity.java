@@ -16,33 +16,20 @@ import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity {
     private Button login;
-    private FirebaseDatabase db;
     private FirebaseAuth fAuth;
     private EditText etEmail, etPass;
     private DatabaseReference userRef;
-    private User user;
-    private DataSnapshot dataSnapshot;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-//        userRef = FirebaseDatabase.getInstance().getReference("/Users/");
-//        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot)
-//            {
-//                dataSnapshot = snapshot;
-//            }
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
+
         fAuth = FirebaseAuth.getInstance();
-        login = (Button)findViewById(R.id.login);
-        etEmail = (EditText)findViewById(R.id.email);
-        etPass = (EditText)findViewById(R.id.password);
+        login = findViewById(R.id.login);
+        etEmail = findViewById(R.id.email);
+        etPass = findViewById(R.id.password);
 
         login.setOnClickListener((v) ->
         {

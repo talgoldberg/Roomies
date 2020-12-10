@@ -48,20 +48,15 @@ public class afterRegisterActivity extends AppCompatActivity
     private static final int CONTACT_PICKER_RESULT = 1001;
     private static final int REQUEST_READ_CONTACTS = 1;
     private static final int REQUEST_SEND_SMS = 2;
-    private static final String DEBUG_TAG = "0";
-    private Button create;
-    private Button join;
+    private static final String DEBUG_TAG = "MY_DEBUG";
+    private Button create, join;
     private EditText etAprName;
     private Dialog d;
     private Map<String, String> contacts = new HashMap<>();
     private ProgressBar pb;
-    private String aprKey = "";
-    private String Name = "";
-    private DataSnapshot ds;
-    private DatabaseReference dbRef;
-    private DatabaseReference aprRef;
-    DatabaseReference reference;
-    FirebaseAuth mAuth;
+    private String aprKey, Name;
+    private DatabaseReference dbRef, reference;
+    private FirebaseAuth mAuth;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -69,9 +64,9 @@ public class afterRegisterActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_after_register);
-        create = (Button)findViewById(R.id.createApr);
-        join=(Button)findViewById(R.id.joinApr);
-        mAuth=FirebaseAuth.getInstance();
+        create = findViewById(R.id.createApr);
+        join = findViewById(R.id.joinApr);
+        mAuth = FirebaseAuth.getInstance();
         reference = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getUid());
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -100,11 +95,11 @@ public class afterRegisterActivity extends AppCompatActivity
             d.setTitle("Create apartment");
             d.setCancelable(true);
             d.show();
-            pb = (ProgressBar)d.findViewById(R.id.progressBar);
-            etAprName = (EditText)d.findViewById(R.id.apartmentName);
+            pb = d.findViewById(R.id.progressBar);
+            etAprName = d.findViewById(R.id.apartmentName);
             dbRef = FirebaseDatabase.getInstance().getReference("/Apartments");
             aprKey = dbRef.push().getKey();
-            ((Button)d.findViewById(R.id.createAprSms)).setOnClickListener((v1 ->
+            (d.findViewById(R.id.createAprSms)).setOnClickListener((v1 ->
             {
                 boolean permissionRequested = false;
                 pb.setVisibility(View.VISIBLE);

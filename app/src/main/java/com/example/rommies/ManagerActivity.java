@@ -48,37 +48,30 @@ import java.util.Map;
 
 public class ManagerActivity extends AppCompatActivity {
 
-    private ListView listViewRoomate;
-    private ArrayAdapter<String> adapter;
-    private Dialog d;
-    private Map<String, String> contacts = new HashMap<>();
-    private Map<String, String> usersMap = new HashMap<>();
-    private Map<String, String> deleteMapUser = new HashMap<>();
     private static final int CONTACT_PICKER_RESULT = 1001;
     private static final int REQUEST_READ_CONTACTS = 1;
     private static final int REQUEST_SEND_SMS = 2;
     private static final String DEBUG_TAG = "0";
-     ArrayList<String> roommates;
-    DatabaseReference dbf;
-     DatabaseReference delete_roomies;
-    DatabaseReference delete_Idaprt_from_users;
-    FirebaseAuth fAuth;
-    Button addrommies;
-    Button deleterommies;
-    Button changenameaprt;
-    TextView textmanage;
-    String aprkey="";
-    String manager="";
+    private ListView listViewRoomate;
+    private ArrayAdapter<String> adapter;
+    private Dialog d;
+    private Map<String, String> contacts = new HashMap<>(), usersMap = new HashMap<>(), deleteMapUser = new HashMap<>();
+    private ArrayList<String> roommates;
+    private DatabaseReference delete_roomies, dbf, delete_Idaprt_from_users;
+    private FirebaseAuth fAuth;
+    private Button deleteRoomies, addRoommies, changeApartmentName;
+    private TextView managerNameTV;
+    private String aprkey, manager;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manager);
-        textmanage=(TextView)findViewById(R.id.textViewmanager);
-        addrommies=(Button)findViewById(R.id.buttonAddRommies);
-        deleterommies=(Button)findViewById(R.id.buttonDeleteRommies);
-        changenameaprt=(Button)findViewById(R.id.buttonNameApartament);
+        managerNameTV = findViewById(R.id.textViewmanager);
+        addRoommies = findViewById(R.id.buttonAddRommies);
+        deleteRoomies = findViewById(R.id.buttonDeleteRommies);
+        changeApartmentName = findViewById(R.id.buttonNameApartament);
 
         roommates=new ArrayList<>();
         fAuth=FirebaseAuth.getInstance();
@@ -103,7 +96,7 @@ public class ManagerActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
                 manager=snapshot.getValue().toString();
-                textmanage.setText("Hello "+manager);
+                managerNameTV.setText("Hello "+manager);
             }
 
             @Override
@@ -112,7 +105,7 @@ public class ManagerActivity extends AppCompatActivity {
             }
         });
 
-        addrommies.setOnClickListener((v)->{
+        addRoommies.setOnClickListener((v)->{
 
 
             d = new Dialog(this);
@@ -147,7 +140,7 @@ public class ManagerActivity extends AppCompatActivity {
 
         });
 
-        deleterommies.setOnClickListener((v)->{
+        deleteRoomies.setOnClickListener((v)->{
             Button cancel;
             d = new Dialog(this);
             d.setContentView(R.layout.delete_roomies);

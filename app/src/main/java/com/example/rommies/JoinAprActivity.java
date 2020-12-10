@@ -27,10 +27,10 @@ public class JoinAprActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join_to_exist_apartment);
-        check = (Button) findViewById(R.id.checkCode);
-        join = (Button) findViewById(R.id.joinButton);
+        check = findViewById(R.id.checkCode);
+        join = findViewById(R.id.joinButton);
 
-        aprtCode = (EditText) findViewById(R.id.CODE);
+        aprtCode = findViewById(R.id.CODE);
 
 
         Intent intentOld = getIntent();
