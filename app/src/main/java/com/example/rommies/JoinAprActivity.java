@@ -27,10 +27,10 @@ public class JoinAprActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join_to_exist_apartment);
-        check = (Button) findViewById(R.id.checkCode);
-        join = (Button) findViewById(R.id.joinButton);
+        check = findViewById(R.id.checkCode);
+        join = findViewById(R.id.joinButton);
 
-        aprtCode = (EditText) findViewById(R.id.CODE);
+        aprtCode = findViewById(R.id.CODE);
 
 
         Intent intentOld = getIntent();
@@ -82,7 +82,7 @@ public class JoinAprActivity extends AppCompatActivity {
             reference.child(UserId).child("IDAprt").setValue(code);
 
             Toast.makeText(JoinAprActivity.this, "successfully", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(this, Apartment.class);
+            Intent intent = new Intent(this, ApartmentActivity.class);
             intent.putExtra("com.example.rommies.aprKey", code);
             startActivity(intent);
 
