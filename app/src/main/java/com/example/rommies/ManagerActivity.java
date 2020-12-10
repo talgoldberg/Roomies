@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Build;
@@ -27,6 +28,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -318,6 +320,10 @@ public class ManagerActivity extends AppCompatActivity {
                             number = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                             Log.v(DEBUG_TAG, "Got phone number: " + number);
                             Log.v(DEBUG_TAG, "Got User name: " + name);
+                            if(contacts.containsValue(number)) {
+                                Toast.makeText(this, "This phone number is already on the list", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
                             contacts.put(name, number);
 
                             LinearLayout ll = d.findViewById(R.id.linearLayout);
@@ -327,19 +333,10 @@ public class ManagerActivity extends AppCompatActivity {
                             tv1.setText(name);
                             tv1.setTextAppearance(getApplicationContext(),R.style.TextAppearance_AppCompat_Medium);
                             tv1.setId(1);
-                            //TextView 2 --> x "button"
-                            GradientDrawable shape = new GradientDrawable();
-                            shape.setShape(GradientDrawable.RECTANGLE);
-                            shape.setColor(Color.RED);
-                            shape.setStroke(5, Color.BLACK);
-                            shape.setCornerRadius(15);
+                            //remove "button"
+
                             Button bt = new Button(d.getContext(),null,android.R.style.Widget_Material_Light_Button_Small);
-                            bt.setText("X");
-                            bt.setTextAppearance(getApplicationContext(),R.style.TextAppearance_AppCompat_Medium);
-                            bt.setBackgroundColor(Color.RED);
-                            bt.setTextColor(Color.WHITE);
-                            bt.setBackground(shape);
-                            bt.setPadding(10,5,10,5);
+                            bt.setBackgroundResource(R.drawable.ic_baseline_delete_24);
                             bt.setOnClickListener((v)->
                             {
                                 contacts.remove(name);

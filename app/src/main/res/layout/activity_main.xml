@@ -23,6 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:padding="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.46"
@@ -33,9 +34,9 @@
         <androidx.cardview.widget.CardView
             android:layout_width="130dp"
             android:layout_height="130dp"
-            android:layout_marginLeft="20dp"
             android:layout_marginTop="580dp"
             app:cardCornerRadius="12dp"
+            android:padding="2dp"
             android:onClick="register"
             >
 
@@ -71,9 +72,10 @@
         <androidx.cardview.widget.CardView
             android:layout_width="130dp"
             android:layout_height="130dp"
-            android:layout_marginLeft="30dp"
+            android:layout_marginLeft="31dp"
             android:layout_marginTop="580dp"
             android:onClick="login"
+            android:padding="2dp"
             app:cardCornerRadius="12dp">
 
             <RelativeLayout

@@ -49,6 +49,16 @@ public class LoginActivity extends AppCompatActivity {
 
             String email = etEmail.getText().toString();
             String password = etPass.getText().toString();
+            if(password.isEmpty())
+            {
+                etPass.setError("You must fill in this field");
+                return;
+            }
+            if(email.isEmpty())
+            {
+                etEmail.setError("You must fill in this field");
+                return;
+            }
             fAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener((task)->
             {
                 if(!task.isSuccessful())

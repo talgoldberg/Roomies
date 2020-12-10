@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Payment {
     private double amount;
-    private String Uid1;
+    private String Payer;
 //    private ArrayList<String> Uid3;
     private  String Reason;
 
@@ -13,7 +13,7 @@ public class Payment {
     }
 
     public Payment(String u1, double money , String r){//, ArrayList<String> l){
-        this.Uid1=u1;
+        this.Payer=u1;
         this.amount=money;
         this.Reason=r;
 //        this.Uid3=l;
@@ -36,16 +36,16 @@ public class Payment {
         this.amount = amount;
     }
 
-    public void setUid1(String uid1) {
-        Uid1 = uid1;
+    public void setPayer(String Payer) {
+        this.Payer = Payer;
     }
 
     public double getAmount() {
         return amount;
     }
 
-    public String getUid1() {
-        return Uid1;
+    public String getPayer() {
+        return Payer;
     }
 
 

@@ -22,15 +22,21 @@
 
     <Button
         android:id="@+id/joinButton"
-        android:layout_width="161dp"
-        android:layout_height="51dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        style="@android:style/Widget.Material.Button.Colored"
+        android:shadowColor="#FFFFFF"
+        android:textColor="@color/black"
+        app:backgroundTintMode="screen"
         android:text="Join"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.492"
+        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.911" />
+        app:layout_constraintTop_toBottomOf="@+id/checkCode"
+        app:layout_constraintVertical_bias="0.022"
+        tools:targetApi="m" />
 
     <EditText
         android:id="@+id/CODE"
@@ -38,6 +44,7 @@
         android:layout_height="58dp"
         android:ems="10"
         android:hint="Apartment code"
+        android:textColorHint="@color/white"
         android:inputType="textPersonName"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -47,15 +54,21 @@
 
     <Button
         android:id="@+id/checkCode"
-        android:layout_width="161dp"
-        android:layout_height="51dp"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="check Code"
+        style="@android:style/Widget.Material.Button.Colored"
+        android:shadowColor="#FFFFFF"
+        android:textColor="@color/black"
+        app:backgroundTintMode="screen"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.803" />
+        app:layout_constraintVertical_bias="0.803"
+        tools:targetApi="m" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

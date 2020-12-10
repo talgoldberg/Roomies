@@ -51,9 +51,27 @@ public class RegisterActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                u = new User(etEmail.getText().toString(), etName.getText().toString());
-                pb.setVisibility(View.VISIBLE);
                 String password = etPass.getText().toString();
+                String email = etEmail.getText().toString();
+                String name = etName.getText().toString();
+                if(password.isEmpty())
+                {
+                    etPass.setError("You must fill in this field");
+                    return;
+                }
+                if(email.isEmpty())
+                {
+                    etEmail.setError("You must fill in this field");
+                    return;
+                }
+                if(name.isEmpty())
+                {
+                    etName.setError("You must fill in this field");
+                    return;
+                }
+                u = new User(email, name);
+
+                pb.setVisibility(View.VISIBLE);
                 fAuth.createUserWithEmailAndPassword(u.getEmail(), password).addOnCompleteListener(new OnCompleteListener<AuthResult>()
                 {
                     @Override

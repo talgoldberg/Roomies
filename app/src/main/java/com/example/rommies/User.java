@@ -2,7 +2,7 @@ package com.example.rommies;
 
 public class User
 {
-    private String email,name, Uid, apartment_Key = null;
+    private String email,name, Uid, Apartment_key = null;
     public User(){}
     public User(String e, String n)
     {
@@ -16,6 +16,6 @@ public class User
 
     public String getAprKey()
     {
-        return apartment_Key;
+        return Apartment_key;
     }
 }
