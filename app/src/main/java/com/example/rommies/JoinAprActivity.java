@@ -56,16 +56,17 @@ public class JoinAprActivity extends AppCompatActivity {
                         join.setOnClickListener(v ->
                         {
 //                            DatabaseReference romi1= FirebaseDatabase.getInstance().getReference().child("roommates").child(UserId);
-                           // DatabaseReference romi2 = FirebaseDatabase.getInstance().getReference().child("Apartments").child(TheCode).child("Balance").child("UserId");
+                            // DatabaseReference romi2 = FirebaseDatabase.getInstance().getReference().child("Apartments").child(TheCode).child("Balance").child("UserId");
                             DatabaseReference aprRef = snapshot.child(TheCode).getRef();
-                            aprRef.addValueEventListener(new ValueEventListener() {
+                            aprRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                                     for(DataSnapshot ds : snapshot.child("roommates").getChildren()) {
-                                        if (!ds.getKey().equals(UserId))
+                                        if (!ds.getKey().equals(UserId)){
                                             aprRef.child("Balance").child(UserId).child(ds.getKey()).setValue(0);
-                                        if (!ds.getKey().equals(UserId))
+                                       // if (!ds.getKey().equals(UserId))
                                             aprRef.child("Balance").child(ds.getKey()).child(UserId).setValue(0);
+                                    }
                                     }
 
                                 }
@@ -97,15 +98,15 @@ public class JoinAprActivity extends AppCompatActivity {
 
     public void play(String code, String UserId,String Name) {
 
-            dbRef.child(code).child("roommates").child(UserId).setValue(Name);
-            reference.child(UserId).child("Apartment_key").setValue(code);
+        dbRef.child(code).child("roommates").child(UserId).setValue(Name);
+        reference.child(UserId).child("Apartment_key").setValue(code);
 
 
-            Toast.makeText(JoinAprActivity.this, "successfully", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(this, ApartmentActivity.class);
+        Toast.makeText(JoinAprActivity.this, "successfully", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, ApartmentActivity.class);
 
-            intent.putExtra("com.example.rommies.aprKey", code);
-            startActivity(intent);
+        intent.putExtra("com.example.rommies.aprKey", code);
+        startActivity(intent);
 
 
     }
