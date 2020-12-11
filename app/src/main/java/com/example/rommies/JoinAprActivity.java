@@ -19,7 +19,7 @@ public class JoinAprActivity extends AppCompatActivity {
 
     private Button join;
     private Button check;
-    private EditText aprtCode;
+    private EditText aprCode;
     private DatabaseReference dbRef;
     private DatabaseReference reference=FirebaseDatabase.getInstance().getReference().child("Users");
 
@@ -29,87 +29,64 @@ public class JoinAprActivity extends AppCompatActivity {
         setContentView(R.layout.activity_join_to_exist_apartment);
         check = findViewById(R.id.checkCode);
         join = findViewById(R.id.joinButton);
-
-        aprtCode = findViewById(R.id.CODE);
+        aprCode = findViewById(R.id.CODE);
 
 
         Intent intentOld = getIntent();
         String UserId = intentOld.getExtras().getString("com.example.roomies.Uid");
         String Name = intentOld.getExtras().getString("com.example.roomies.Name");
-
+        join.setOnClickListener((v) -> Toast.makeText(JoinAprActivity.this, "Please check your code first", Toast.LENGTH_SHORT).show());
         check.setOnClickListener(v->
         {
-            String TheCode = aprtCode.getText().toString();
-
+            String TheCode = aprCode.getText().toString();
+            if(TheCode.isEmpty())
+            {
+                aprCode.setError("Please enter apartment code");
+                return;
+            }
             dbRef = FirebaseDatabase.getInstance().getReference().child("Apartments");
-
             dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if (!snapshot.hasChild(aprtCode.getText().toString())) {
+                    if (!snapshot.hasChild(aprCode.getText().toString())) {
 
-                        aprtCode.setError("No such apartment");
+                        aprCode.setError("No such apartment");
                     }
                     else{
-                        Toast.makeText(JoinAprActivity.this, "Proper code\n" +
-                                "Press Join", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(JoinAprActivity.this, "Proper code\n" + "Press Join", Toast.LENGTH_SHORT).show();
                         join.setOnClickListener(v ->
                         {
-//                            DatabaseReference romi1= FirebaseDatabase.getInstance().getReference().child("roommates").child(UserId);
-                            // DatabaseReference romi2 = FirebaseDatabase.getInstance().getReference().child("Apartments").child(TheCode).child("Balance").child("UserId");
                             DatabaseReference aprRef = snapshot.child(TheCode).getRef();
-                            aprRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            aprRef.addListenerForSingleValueEvent(new ValueEventListener()
+                            {
                                 @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    for(DataSnapshot ds : snapshot.child("roommates").getChildren()) {
-                                        if (!ds.getKey().equals(UserId)){
-                                            aprRef.child("Balance").child(UserId).child(ds.getKey()).setValue(0);
-                                       // if (!ds.getKey().equals(UserId))
-                                            aprRef.child("Balance").child(ds.getKey()).child(UserId).setValue(0);
+                                public void onDataChange(@NonNull DataSnapshot snapshot)
+                                {
+                                    for(DataSnapshot ds : snapshot.child("roommates").getChildren())
+                                    {
+                                        if(ds.getKey()!=null) {
+                                            if (!ds.getKey().equals(UserId)) {
+                                                aprRef.child("Balance").child(UserId).child(ds.getKey()).setValue(0);
+                                                aprRef.child("Balance").child(ds.getKey()).child(UserId).setValue(0);
+                                            }
+                                        }
                                     }
-                                    }
-
                                 }
-
                                 @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
-
-                                }
+                                public void onCancelled(@NonNull DatabaseError error) {}
                             });
-                            play(TheCode,UserId,Name);
-
-
+                            dbRef.child(TheCode).child("roommates").child(UserId).setValue(Name);
+                            reference.child(UserId).child("Apartment_key").setValue(TheCode);
+                            Toast.makeText(JoinAprActivity.this, "successfully", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(getApplicationContext(), ApartmentActivity.class);
+                            intent.putExtra("com.example.rommies.aprKey", TheCode);
+                            startActivity(intent);
                         });
-
                     }
-
-
                 }
-
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                }
+                public void onCancelled(@NonNull DatabaseError error) {}
             });
-
         });
-
-
     }
-
-    public void play(String code, String UserId,String Name) {
-
-        dbRef.child(code).child("roommates").child(UserId).setValue(Name);
-        reference.child(UserId).child("Apartment_key").setValue(code);
-
-
-        Toast.makeText(JoinAprActivity.this, "successfully", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(this, ApartmentActivity.class);
-
-        intent.putExtra("com.example.rommies.aprKey", code);
-        startActivity(intent);
-
-
-    }
-
-
 }
