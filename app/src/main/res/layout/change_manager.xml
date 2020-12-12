@@ -7,50 +7,48 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/textViewdeleteroomies"
-        android:layout_width="150dp"
-        android:layout_height="51dp"
+        android:id="@+id/textViewchosemanager"
+        android:layout_width="162dp"
+        android:layout_height="78dp"
         android:gravity="center"
-        android:text="Long press to delete roomies"
+        android:text="Long press to choose a manager"
         android:textColor="#03A9F4"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.114" />
+        app:layout_constraintVertical_bias="0.071" />
 
     <LinearLayout
-        android:id="@+id/linearLayout2"
+        android:id="@+id/linearLayout1"
         android:layout_width="279dp"
         android:layout_height="357dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewdeleteroomies"
+        app:layout_constraintTop_toBottomOf="@+id/textViewchosemanager"
         app:layout_constraintVertical_bias="0.354">
 
         <ListView
-            android:id="@+id/listviewchoose"
+            android:id="@+id/listviewchoosemanager"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-             />
+            android:layout_height="match_parent" />
     </LinearLayout>
 
     <Button
-        android:id="@+id/BtnCancele"
+        android:id="@+id/btnback"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="CANCEL"
+        android:text="back"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
-        app:layout_constraintVertical_bias="0.37" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout1"
+        app:layout_constraintVertical_bias="0.414" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

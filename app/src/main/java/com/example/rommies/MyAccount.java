@@ -28,7 +28,7 @@ public class MyAccount extends AppCompatActivity {
     TextView message;
     ArrayList<String> names;
     int index;
-    String Myname = "";
+    String Myname, Uid;
     StringBuilder stringBuilder;
     private String key_ap;
     private Map<String, String> users = new HashMap<>();
@@ -39,21 +39,23 @@ public class MyAccount extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_account);
+
         stringBuilder = new StringBuilder();
-        myaccount = (TextView) findViewById(R.id.textViewAccount);
-        message = (TextView) findViewById(R.id.textviewmsg);
+        myaccount = findViewById(R.id.textViewAccount);
+        message = findViewById(R.id.textviewmsg);
         names = new ArrayList<>();
         Balance = new HashMap<>();
         mAuth = FirebaseAuth.getInstance();
-//        FirebaseUser user = mAuth.getCurrentUser();
-//        String userID = user.getUid();
-
-        Dref = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getUid());
+        Uid = mAuth.getUid();
+        System.out.println(Uid);
+        Dref = FirebaseDatabase.getInstance().getReference().child("Users").child(Uid);
         key_ap = getIntent().getExtras().getString("com.app.java.acc.key");
         users = (Map<String, String>) getIntent().getExtras().get("com.app.java.acc.users");
-        users.put(mAuth.getUid(), "12");
-        // System.out.print("maxim123  : " + userID + "   :  "+key_ap  );
-
+        users.put(Uid, "12");
+        if (getIntent().hasExtra("position_rommie") && getIntent().hasExtra("name_roomie")) {
+            index = getIntent().getIntExtra("position_rommie", -1);
+            names = getIntent().getStringArrayListExtra("name_roomie");
+        }
         mRaf = FirebaseDatabase.getInstance().getReference("/Apartments/" + key_ap).child("Balance");
         mRaf.addValueEventListener(new ValueEventListener() {
             @Override
@@ -97,43 +99,33 @@ public class MyAccount extends AppCompatActivity {
     }
 
     private void SetUpAccount(String curent_name) {
-        if (getIntent().hasExtra("position_rommie") && getIntent().hasExtra("name_roomie")) {
-            index = getIntent().getIntExtra("position_rommie", -1);
-            names = getIntent().getStringArrayListExtra("name_roomie");
-        }
-
         if (index != -1 && !names.isEmpty()) {
 
             if (curent_name.equals(names.get(index))) {
                 myaccount.setText("My Account");
-               // for (Map.Entry<String, HashMap<String, Double>> user1 : Balance.entrySet()) {
-                    //String ds=user1.getKey();
-                    for (Map.Entry<String, Double> us : Balance.get(mAuth.getUid()).entrySet()) {
-                        for(Map.Entry<String,String> name: users.entrySet() )
-                        {
-                            if(us.getKey().equals(name.getKey())) {
-
-                                DecimalFormat df = new DecimalFormat("#.##");
-                                final Double Money=us.getValue();
-                                stringBuilder.append("Your Balance with " + name.getValue() + " is : " + df.format(Money) + "\n");
-                            }
+                for (Map.Entry<String, Double> us : Balance.get(Uid).entrySet()) {
+                    for(Map.Entry<String,String> name: users.entrySet() )
+                    {
+                        if(us.getKey().equals(name.getKey())) {
+                            DecimalFormat df = new DecimalFormat("#.##");
+                            final Double Money=us.getValue();
+                            stringBuilder.append("Your Balance with " + name.getValue() + " is : " + df.format(Money) + "\n");
                         }
                     }
-
-
-           }
-                if (!curent_name.equals(names.get(index))) {
-                    for(Map.Entry<String,String> name: users.entrySet() ){
-                        if(name.getValue().equals(names.get(index))){
-                            stringBuilder.append(names.get(index)+ " Own you  "+ Balance.get(name.getKey()).get(mAuth.getUid()).doubleValue()  +"\n");
-                        }
-                    }
-
-                    myaccount.setText(names.get(index) + " Account");
-
                 }
-                message.setText(stringBuilder.toString());
-
+           }
+            if (!curent_name.equals(names.get(index))) {
+                for(Map.Entry<String,String> name: users.entrySet() ){
+                    if(name.getValue().equals(names.get(index))){
+                        DecimalFormat df = new DecimalFormat("#.##");
+                        final Double Money = Balance.get(name.getKey()).get(Uid);
+                        stringBuilder.append(names.get(index)+ " Owe you  "+ df.format(Money) +"\n");
+                    }
+                }
+                myaccount.setText(names.get(index) + " Account");
             }
-        }}
+            message.setText(stringBuilder.toString());
+        }
+    }
+}
 

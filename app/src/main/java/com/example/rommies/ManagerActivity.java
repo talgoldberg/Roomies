@@ -67,11 +67,15 @@ public class ManagerActivity extends AppCompatActivity {
     DatabaseReference delete_roomies_from_balance;
     DatabaseReference delete_childs_from_balance;
     DatabaseReference change_name_aprt;
+    DatabaseReference change_manager;
 
     FirebaseAuth fAuth;
+
     Button addrommies;
     Button deleterommies;
     Button changenameaprt;
+    Button changemanager;
+
     Button back;
     Button change;
     EditText nameaprt;
@@ -79,6 +83,8 @@ public class ManagerActivity extends AppCompatActivity {
     String aprkey="";
     String manager="";
     String aprt="";
+    String uidResult="";
+    String nameResult="";
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -89,7 +95,7 @@ public class ManagerActivity extends AppCompatActivity {
         addrommies=(Button)findViewById(R.id.buttonAddRommies);
         deleterommies=(Button)findViewById(R.id.buttonDeleteRommies);
         changenameaprt=(Button)findViewById(R.id.buttonNameApartament);
-
+        changemanager=(Button)findViewById(R.id.btnChangerManager);
         roommates=new ArrayList<>();
         fAuth=FirebaseAuth.getInstance();
 
@@ -158,10 +164,7 @@ public class ManagerActivity extends AppCompatActivity {
 
         deleterommies.setOnClickListener((v)->{
             Button cancel;
-//            for(Map.Entry<String,String> entry: usersMap.entrySet())
-//            {
-//                copyMap.put(entry.getKey(),entry.getValue());
-//            }
+
             d = new Dialog(this);
             d.setContentView(R.layout.delete_roomies);
             d.setTitle("Long press to delete roomies");
@@ -264,7 +267,78 @@ public class ManagerActivity extends AppCompatActivity {
 
 
         });
+        changemanager.setOnClickListener((v)->{
 
+            Button back;
+
+            d = new Dialog(this);
+            d.setContentView(R.layout.change_manager);
+            d.setTitle("Long press to choose a manager");
+            d.setCancelable(true);
+            d.show();
+            back=(Button)d.findViewById(R.id.btnback);
+            listViewRoomate=(ListView)d.findViewById(R.id.listviewchoosemanager);
+            adapter=new ArrayAdapter<>(ManagerActivity.this, android.R.layout.simple_list_item_1,roommates);
+            listViewRoomate.setAdapter(adapter);
+
+            listViewRoomate.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                    final int item=position;
+
+                    new AlertDialog.Builder(ManagerActivity.this)
+                            .setIcon(android.R.drawable.star_big_on)
+                            .setTitle("Are you sure ?")
+                            .setMessage("Do you want to choose this manager")
+                            .setPositiveButton("Yes",new DialogInterface.OnClickListener(){
+
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    System.out.println("111111111");
+                                    for(Map.Entry<String,String> entry: usersMap.entrySet())
+                                    {
+                                        System.out.println("000000000"+entry.getKey());
+                                        String uid=entry.getKey();
+                                        String name=entry.getValue();
+                                        if(usersMap.containsKey(uid) && name.equals(roommates.get(item)))
+                                        {
+                                            uidResult=uid;
+                                            nameResult=name;
+                                            break;
+
+                                        }
+                                    }
+                                }
+                            })
+                            .setNegativeButton("No", null)
+                            .show();
+
+                    return true;
+                }
+            });
+            back.setOnClickListener((v1)->{
+
+                if(!uidResult.isEmpty() && !nameResult.isEmpty())
+                {
+                    change_manager_aprt();
+                    Intent intent=new Intent();
+                    intent.putExtra("change_manager_aprt",uidResult);
+                    setResult(RESULT_FIRST_USER,intent);
+                    d.dismiss();
+                }
+                else
+                {
+                    d.dismiss();
+                }
+
+            });
+        });
+    }
+    private  void change_manager_aprt()
+    {
+        change_manager=FirebaseDatabase.getInstance().getReference().child("Apartments").child(aprkey).child("Manager");
+        change_manager.setValue(uidResult);
     }
 
     private void change_name_aprtment_from_firebase()
