@@ -26,14 +26,13 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
-
 
 public class ApartmentActivity extends AppCompatActivity {
 
+    public static final int CHANGE_APARTMENT_NAME = 1001;
     private ListView listViewRoommates;
     private ArrayAdapter<String> adapter;
-    private TextView aprName;
+    private TextView aprNameTV;
     private static ArrayList<String> roommates, withoutManagerArr;
     private FirebaseAuth mAuth;
     private String manager, managerUid, aprKey;
@@ -48,7 +47,7 @@ public class ApartmentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_apartment);
         mAuth=FirebaseAuth.getInstance();
-        aprName = findViewById(R.id.ApartamenTextView);
+        aprNameTV = findViewById(R.id.ApartamenTextView);
 
         /*handle back button press */
 
@@ -74,7 +73,7 @@ public class ApartmentActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                    aprName.setText(snapshot.child("Name").getValue().toString());
+                    aprNameTV.setText(snapshot.child("Name").getValue().toString());
                     if(mAuth.getUid().equals(snapshot.child("Manager").getValue())){
                         managerUid=snapshot.child("Manager").getValue().toString();
                         adminBtn.setVisible(true);
@@ -138,11 +137,25 @@ public class ApartmentActivity extends AppCompatActivity {
                 in.putStringArrayListExtra("list",withoutManagerArr);
 
                 in.putExtra("hash",usersMap);
-                startActivity(in);
+                startActivityForResult(in,CHANGE_APARTMENT_NAME);
                 break;
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == CHANGE_APARTMENT_NAME)
+        {
+            if(resultCode==RESULT_OK)
+            {
+                String n=data.getStringExtra("change_name_aprt");
+                aprNameTV.setText(n);
+
+            }
+        }
     }
 
     private void updateRoommates(String key)
