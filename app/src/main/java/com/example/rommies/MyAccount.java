@@ -119,7 +119,12 @@ public class MyAccount extends AppCompatActivity {
                     if(name.getValue().equals(names.get(index))){
                         DecimalFormat df = new DecimalFormat("#.##");
                         final Double Money = Balance.get(name.getKey()).get(Uid);
-                        stringBuilder.append(names.get(index)+ " Owe you  "+ df.format(Money) +"\n");
+                        if(Money > 0 )
+                            stringBuilder.append(names.get(index)+ " Owe you  "+ df.format(Money) +"nis \n");
+                        else if(Money < 0)
+                            stringBuilder.append("You owe to "+names.get(index)+ ": " + df.format(Math.abs(Money)) +" nis \n");
+                        else
+                            stringBuilder.append("You and "+names.get(index)+ " are even." +"\n");
                     }
                 }
                 myaccount.setText(names.get(index) + " Account");
