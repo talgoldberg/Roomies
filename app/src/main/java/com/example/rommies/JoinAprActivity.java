@@ -35,6 +35,10 @@ public class JoinAprActivity extends AppCompatActivity {
         Intent intentOld = getIntent();
         String UserId = intentOld.getExtras().getString("com.example.roomies.Uid");
         String Name = intentOld.getExtras().getString("com.example.roomies.Name");
+        if(getIntent().hasExtra("com.example.rommies.aprKey"))
+        {
+            aprCode.setText(getIntent().getStringExtra("com.example.rommies.aprKey"));
+        }
         join.setOnClickListener((v) -> Toast.makeText(JoinAprActivity.this, "Please check your code first", Toast.LENGTH_SHORT).show());
         check.setOnClickListener(v->
         {

@@ -80,7 +80,7 @@ public class ManagerActivity extends AppCompatActivity {
     Button change;
     EditText nameaprt;
     TextView textmanage;
-    String aprkey="";
+    String aprKey="";
     String manager="";
     String aprt="";
     String uidResult="";
@@ -102,7 +102,7 @@ public class ManagerActivity extends AppCompatActivity {
 
         if(getIntent().hasExtra("keyaprt") && getIntent().hasExtra("list") && getIntent().hasExtra("hash"))
         {
-            aprkey=getIntent().getStringExtra("keyaprt");
+            aprKey=getIntent().getStringExtra("keyaprt");
             roommates=getIntent().getStringArrayListExtra("list");
             usersMap=(HashMap<String, String>)getIntent().getSerializableExtra("hash");
             for(int i=0; i<roommates.size(); i++)
@@ -114,7 +114,7 @@ public class ManagerActivity extends AppCompatActivity {
                 System.out.println(entry.getKey() + " ????" + entry.getValue());
             }
         }
-        dbf=FirebaseDatabase.getInstance().getReference().child("Apartments").child(aprkey).child("roommates").child(fAuth.getUid());
+        dbf=FirebaseDatabase.getInstance().getReference().child("Apartments").child(aprKey).child("roommates").child(fAuth.getUid());
         dbf.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -138,7 +138,6 @@ public class ManagerActivity extends AppCompatActivity {
             d.show();
             ((Button)d.findViewById(R.id.SendSms)).setOnClickListener((v1 ->
             {
-
                 if(!contacts.isEmpty())
                 {
                     if(checkSelfPermission(Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED)
@@ -147,9 +146,7 @@ public class ManagerActivity extends AppCompatActivity {
                     }
                     else
                     {
-
                         Send_SMS();
-
                     }
                 }
                 else
@@ -157,14 +154,12 @@ public class ManagerActivity extends AppCompatActivity {
                     Toast.makeText(ManagerActivity.this,"you need to choose a friend",Toast.LENGTH_SHORT).show();
                 }
                 d.dismiss();
-
             }));
-
         });
 
-        deleterommies.setOnClickListener((v)->{
+        deleterommies.setOnClickListener((v)->
+        {
             Button cancel;
-
             d = new Dialog(this);
             d.setContentView(R.layout.delete_roomies);
             d.setTitle("Long press to delete roomies");
@@ -179,38 +174,31 @@ public class ManagerActivity extends AppCompatActivity {
                 public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
                     final int item=position;
-
                     new AlertDialog.Builder(ManagerActivity.this)
                             .setIcon(android.R.drawable.ic_delete)
                             .setTitle("Are you sure ?")
                             .setMessage("Do you want to delete this roomie")
                             .setPositiveButton("Yes",new DialogInterface.OnClickListener(){
-
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     System.out.println("111111111");
                                     for(Map.Entry<String,String> entry: usersMap.entrySet())
                                     {
-                                        System.out.println("000000000"+entry.getKey());
                                         String uid=entry.getKey();
                                         String name=entry.getValue();
                                         if(usersMap.containsKey(uid) && name.equals(roommates.get(item)))
                                         {
-
                                             deleteMapUser.put(uid,name);
                                             usersMap.remove(uid);
                                             break;
-
                                         }
                                     }
                                     roommates.remove(item);
                                     adapter.notifyDataSetChanged();
-
                                 }
                             })
                             .setNegativeButton("No", null)
                             .show();
-
                     return true;
                 }
             });
@@ -222,7 +210,6 @@ public class ManagerActivity extends AppCompatActivity {
                     d.dismiss();
                 }
             });
-
         });
 
         changenameaprt.setOnClickListener((v)->{
@@ -236,7 +223,6 @@ public class ManagerActivity extends AppCompatActivity {
             back=(Button)d.findViewById(R.id.buttonback);
             nameaprt=(EditText)d.findViewById(R.id.editTextNameAprt);
 
-
             change.setOnClickListener((v1)->{
 
                 aprt=nameaprt.getText().toString().trim();
@@ -245,7 +231,6 @@ public class ManagerActivity extends AppCompatActivity {
                     nameaprt.setError("you need to write a name");
                     nameaprt.requestFocus();
                     return;
-
                 }
                 if(!aprt.isEmpty())
                 {
@@ -253,24 +238,13 @@ public class ManagerActivity extends AppCompatActivity {
                     Intent intent=new Intent();
                     intent.putExtra("change_name_aprt",aprt);
                     setResult(RESULT_OK,intent);
-
                     d.dismiss();
-
                 }
-
             });
-
-            back.setOnClickListener((v1)->{
-
-                d.dismiss();
-            });
-
-
+            back.setOnClickListener((v1)->d.dismiss());
         });
         changemanager.setOnClickListener((v)->{
-
             Button back;
-
             d = new Dialog(this);
             d.setContentView(R.layout.change_manager);
             d.setTitle("Long press to choose a manager");
@@ -280,70 +254,56 @@ public class ManagerActivity extends AppCompatActivity {
             listViewRoomate=(ListView)d.findViewById(R.id.listviewchoosemanager);
             adapter=new ArrayAdapter<>(ManagerActivity.this, android.R.layout.simple_list_item_1,roommates);
             listViewRoomate.setAdapter(adapter);
-
             listViewRoomate.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                 @Override
                 public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-
                     final int item=position;
-
                     new AlertDialog.Builder(ManagerActivity.this)
                             .setIcon(android.R.drawable.star_big_on)
                             .setTitle("Are you sure ?")
                             .setMessage("Do you want to choose this manager")
-                            .setPositiveButton("Yes",new DialogInterface.OnClickListener(){
-
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    System.out.println("111111111");
-                                    for(Map.Entry<String,String> entry: usersMap.entrySet())
+                            .setPositiveButton("Yes", (dialog, which) -> {
+                                System.out.println("111111111");
+                                for(Map.Entry<String,String> entry: usersMap.entrySet())
+                                {
+                                    System.out.println("000000000"+entry.getKey());
+                                    String uid=entry.getKey();
+                                    String name=entry.getValue();
+                                    if(usersMap.containsKey(uid) && name.equals(roommates.get(item)))
                                     {
-                                        System.out.println("000000000"+entry.getKey());
-                                        String uid=entry.getKey();
-                                        String name=entry.getValue();
-                                        if(usersMap.containsKey(uid) && name.equals(roommates.get(item)))
-                                        {
-                                            uidResult=uid;
-                                            nameResult=name;
-                                            break;
+                                        uidResult=uid;
+                                        nameResult=name;
+                                        break;
 
-                                        }
                                     }
                                 }
                             })
                             .setNegativeButton("No", null)
                             .show();
-
                     return true;
                 }
             });
             back.setOnClickListener((v1)->{
-
                 if(!uidResult.isEmpty() && !nameResult.isEmpty())
                 {
                     change_manager_aprt();
                     Intent intent=new Intent();
                     intent.putExtra("change_manager_aprt",uidResult);
                     setResult(RESULT_FIRST_USER,intent);
-                    d.dismiss();
                 }
-                else
-                {
-                    d.dismiss();
-                }
-
+                d.dismiss();
             });
         });
     }
     private  void change_manager_aprt()
     {
-        change_manager=FirebaseDatabase.getInstance().getReference().child("Apartments").child(aprkey).child("Manager");
+        change_manager=FirebaseDatabase.getInstance().getReference().child("Apartments").child(aprKey).child("Manager");
         change_manager.setValue(uidResult);
     }
 
     private void change_name_aprtment_from_firebase()
     {
-        change_name_aprt=FirebaseDatabase.getInstance().getReference().child("Apartments").child(aprkey).child("Name");
+        change_name_aprt=FirebaseDatabase.getInstance().getReference().child("Apartments").child(aprKey).child("Name");
         change_name_aprt.setValue(aprt);
     }
 
@@ -351,7 +311,7 @@ public class ManagerActivity extends AppCompatActivity {
     {
         if(!deleteMapUser.isEmpty())
         {
-            delete_roomies=FirebaseDatabase.getInstance().getReference().child("Apartments").child(aprkey).child("roommates");
+            delete_roomies=FirebaseDatabase.getInstance().getReference().child("Apartments").child(aprKey).child("roommates");
 
             delete_roomies.addValueEventListener(new ValueEventListener() {
                 @Override
@@ -367,16 +327,11 @@ public class ManagerActivity extends AppCompatActivity {
                             if(entry.getKey().equals(uidkey) && entry.getValue().equals(username))
                                 snap.getRef().removeValue();
                         }
-
                     }
                     delete_from_balance();
-
                 }
-
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
+                public void onCancelled(@NonNull DatabaseError error) {}
             });
         }
     }
@@ -389,16 +344,14 @@ public class ManagerActivity extends AppCompatActivity {
             String uid=entry.getKey();
             delete_uid_from_balance.add(entry.getKey());
             System.out.println("$$$$$$$$$$ "+delete_uid_from_balance.toString());
-            delete_roomies_from_balance=FirebaseDatabase.getInstance().getReference().child("Apartments").child(aprkey).child("Balance").child(uid);
+            delete_roomies_from_balance=FirebaseDatabase.getInstance().getReference().child("Apartments").child(aprKey).child("Balance").child(uid);
             delete_roomies_from_balance.setValue(null);
         }
         usersMap.put(fAuth.getUid(),manager);
         for(Map.Entry<String,String> entry: usersMap.entrySet())
         {
-
             String uid=entry.getKey();
-            System.out.println("////------////// "+uid);
-            delete_childs_from_balance=FirebaseDatabase.getInstance().getReference().child("Apartments").child(aprkey).child("Balance").child(uid);
+            delete_childs_from_balance=FirebaseDatabase.getInstance().getReference().child("Apartments").child(aprKey).child("Balance").child(uid);
             delete_childs_from_balance.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -413,19 +366,11 @@ public class ManagerActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
+                public void onCancelled(@NonNull DatabaseError error) {}
             });
-
-
         }
-
         deleteUsersIdApart();
     }
-
-
-
 
     private void deleteUsersIdApart()
     {
@@ -434,9 +379,7 @@ public class ManagerActivity extends AppCompatActivity {
             for(Map.Entry<String,String> entry : deleteMapUser.entrySet())
             {
                 String uid=entry.getKey();
-
                 delete_Idaprt_from_users=FirebaseDatabase.getInstance().getReference().child("Users").child(uid);
-
                 delete_Idaprt_from_users.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -448,11 +391,8 @@ public class ManagerActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
+                    public void onCancelled(@NonNull DatabaseError error) {}
                 });
-
             }
         }
     }
@@ -551,7 +491,6 @@ public class ManagerActivity extends AppCompatActivity {
             Log.w(DEBUG_TAG, "Warning: activity result not ok");
         }
     }
-
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQUEST_READ_CONTACTS: {
@@ -577,8 +516,6 @@ public class ManagerActivity extends AppCompatActivity {
     }
     private void Send_SMS()
     {
-
-
         String SENT = "SMS_SENT";
         String DELIVERED = "SMS_DELIVERED";
         ArrayList<PendingIntent> sentPI = new ArrayList<>();
@@ -588,14 +525,12 @@ public class ManagerActivity extends AppCompatActivity {
 
         for(Map.Entry<String,String> entry: contacts.entrySet())
         {
-            String message = "hey " + entry.getKey() +"\n Come and join my apartment.\n Copy and paste this key in your Roomies app.\n "+ aprkey;
+            String message = "hey " + entry.getKey() +"\n Come and join my apartment.\n press this link and start enjoying Roomies app.\n "+
+                    "https://rommies.page.link/"+aprKey;
             SmsManager sms = SmsManager.getDefault();
             ArrayList<String> parts = sms.divideMessage(message);
             sms.sendMultipartTextMessage(entry.getValue(),null, parts,sentPI, deliveredPI );
             Log.v(DEBUG_TAG,message);
         }
-
-
     }
-
 }

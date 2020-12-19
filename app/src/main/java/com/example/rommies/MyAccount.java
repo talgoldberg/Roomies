@@ -120,7 +120,7 @@ public class MyAccount extends AppCompatActivity {
                         DecimalFormat df = new DecimalFormat("#.##");
                         final Double Money = Balance.get(name.getKey()).get(Uid);
                         if(Money > 0 )
-                            stringBuilder.append(names.get(index)+ " Owe you  "+ df.format(Money) +"nis \n");
+                            stringBuilder.append(names.get(index)+ " Owe you  "+ df.format(Money) +" nis \n");
                         else if(Money < 0)
                             stringBuilder.append("You owe to "+names.get(index)+ ": " + df.format(Math.abs(Money)) +" nis \n");
                         else

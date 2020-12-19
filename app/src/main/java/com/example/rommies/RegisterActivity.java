@@ -89,6 +89,17 @@ public class RegisterActivity extends AppCompatActivity
                         dbRef.child("Users").child(Uid).setValue(u);
                         pb.setVisibility(View.GONE);
                         Toast.makeText(RegisterActivity.this, "user created successfully", Toast.LENGTH_SHORT).show();
+
+                        if(getIntent().hasExtra("com.example.rommies.aprKey"))//handle deep link
+                        {
+                            Intent intent = new Intent(getApplicationContext(), JoinAprActivity.class);
+                            intent.putExtra("com.example.roomies.Name",u.getName());
+                            intent.putExtra("com.example.roomies.Uid",u.getUid());
+                            intent.putExtra("com.example.rommies.aprKey", getIntent().getStringExtra("com.example.rommies.aprKey"));
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
+                            return;
+                        }
                         Intent intent = new Intent(RegisterActivity.this, afterRegisterActivity.class);
                         startActivity(intent);
                         finish();

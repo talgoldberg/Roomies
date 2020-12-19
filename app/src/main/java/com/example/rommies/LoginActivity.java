@@ -54,6 +54,7 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
                 Toast.makeText(LoginActivity.this, "login succeed", Toast.LENGTH_SHORT).show();
+
                 userRef = FirebaseDatabase.getInstance().getReference("/Users/"+task.getResult().getUser().getUid());
                 userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -65,6 +66,13 @@ public class LoginActivity extends AppCompatActivity {
                             intent = new Intent(getApplicationContext(), ApartmentActivity.class);
                             intent.putExtra("com.example.rommies.aprKey",(String)snapshot.child("Apartment_key").getValue());
                         }
+                        else if(getIntent().hasExtra("com.example.rommies.aprKey"))//handle deep linking
+                        {
+                            intent = new Intent(getApplicationContext(), JoinAprActivity.class);
+                            intent.putExtra("com.example.roomies.Name",(String)snapshot.child("name").getValue());
+                            intent.putExtra("com.example.roomies.Uid",fAuth.getUid());
+                            intent.putExtra("com.example.rommies.aprKey", getIntent().getStringExtra("com.example.rommies.aprKey"));
+                        }
                         else
                             intent = new Intent(getApplicationContext(), afterRegisterActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -73,19 +81,9 @@ public class LoginActivity extends AppCompatActivity {
 
                     }
                     @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
+                    public void onCancelled(@NonNull DatabaseError error) {}
                 });
-
             });
-
         });
     }
-
-
-
-
-
-
 }

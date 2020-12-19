@@ -278,7 +278,8 @@ public class afterRegisterActivity extends AppCompatActivity
 
         for(Map.Entry<String,String> entry: contacts.entrySet())
         {
-            String message = "hey " + entry.getKey() +"\n Come and join my apartment.\n Copy and paste this key in your Roomies app.\n "+ aprKey;
+            String message = "hey " + entry.getKey() +"\n Come and join my apartment.\n press this link and start enjoying Roomies app.\n "+
+                    "https://rommies.page.link/"+ aprKey;
             SmsManager sms = SmsManager.getDefault();
             ArrayList<String> parts = sms.divideMessage(message);
             sms.sendMultipartTextMessage(entry.getValue(),null, parts,sentPI, deliveredPI );
